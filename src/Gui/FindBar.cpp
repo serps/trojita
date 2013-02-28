@@ -168,14 +168,13 @@ void FindBar::notifyMatch(bool match)
     QPalette p = m_lineEdit->palette();
 
     if (m_lineEdit->text().isEmpty()) {
-        p.setColor(QPalette::Base, palette().color(QPalette::Base));
+        p.setColor(QPalette::Base, palette().color(QPalette::Base));	// Base  - Nothing entered
+    } else if (match) {
+        p.setColor(QPalette::Base, QColor(64, 220, 64, 32));			// Green - Match(es) found
     } else {
-        if (match) {
-            p.setColor(QPalette::Base, QColor(230, 247, 230));
-        } else {
-            p.setColor(QPalette::Base, QColor(247, 230, 230));
-        }
+        p.setColor(QPalette::Base, QColor(255, 64, 64, 32));			// Red   - No matches
     }
+
     m_lineEdit->setPalette(p);
 }
 
