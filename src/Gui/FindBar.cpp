@@ -165,7 +165,7 @@ void FindBar::setVisible(bool visible)
 
 void FindBar::notifyMatch(bool match)
 {
-	QPalette p = m_lineEdit->palette();
+    QPalette p = m_lineEdit->palette();
 
     if (m_lineEdit->text().isEmpty()) {
         p.setColor(QPalette::Base, palette().color(QPalette::Base));	// Base  - Nothing entered
