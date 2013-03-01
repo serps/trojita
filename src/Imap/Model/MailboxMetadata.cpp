@@ -216,8 +216,8 @@ QDebug operator<<(QDebug &dbg, const Imap::Mailbox::MailboxMetadata &metadata)
 
 QDataStream &operator>>(QDataStream &stream, Imap::Mailbox::SyncState &ss)
 {
-    uint i;
-    quint64 i64;
+    uint i = 0;
+    quint64 i64 = 0;
     QStringList list;
     stream >> i; ss.setExists(i);
     stream >> list; ss.setFlags(list);

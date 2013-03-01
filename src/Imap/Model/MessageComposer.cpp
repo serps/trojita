@@ -335,8 +335,8 @@ bool MessageComposer::dropImapPart(QDataStream &stream)
         return false;
     }
     QString mailbox;
-    uint uidValidity;
-    uint uid;
+    uint uidValidity = 0;
+    uint uid = 0;
     QString partId;
     QString trojitaPath;
     if (!validateDropImapPart(stream, mailbox, uidValidity, uid, partId, trojitaPath))
