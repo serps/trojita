@@ -88,15 +88,18 @@ void SimplePartWidget::slotMarkupPlainText() {
         // BLACK UP-POINTING SMALL TRIANGLE (U+25B4)
         // BLACK DOWN-POINTING SMALL TRIANGLE (U+25BE)
         "span.full > blockquote > label:before {content: \"\u25b4\"}"
-        "span.short > blockquote > label:after {content: \" \u25be\"}"
+        "span.short > blockquote > label:after {content: \"\u25be\"}"
         "span.shortquote > blockquote > label {display: none}"
     );
 
     QPalette palette = QApplication::palette();
     QString textColors;
     if (palette.background().color().lightness() < 50) {
-        textColors = QString::fromUtf8("body { background-color: %1; color: %2 }").arg(palette.base().color().name(),
-                                                                                       palette.text().color().name());
+        // Ideally the tab background should be coloured with alternateBase, however it's a bit messy and needs a stylesheet.
+        // This is not a very nice way of doing it - but good enough for now.
+        textColors = QString::fromUtf8("body { background-color: %1; color: %2 }").arg(palette.alternateBase().color().name(),
+                                                                                                 palette.text().color().name());
+        textColors += QString::fromUtf8("a { text-decoration: underline; color: %1 }").arg(palette.link().color().name());
     }
 
     // build stylesheet and html header
@@ -118,7 +121,7 @@ void SimplePartWidget::slotMarkupPlainText() {
         }
     }
     QString htmlHeader("<html><head><style type=\"text/css\"><!--" + stylesheet + textColors + "--></style></head><body><pre>");
-    static QString htmlFooter("\n</pre></body></html>");
+    static const QString htmlFooter("\n</pre></body></html>");
 
     QString markup = Composer::Util::plainTextToHtml(page()->mainFrame()->toPlainText(), flowedFormat);
 
