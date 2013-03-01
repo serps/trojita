@@ -280,12 +280,9 @@ QLatin1String TreeItemMailbox::flagHasChildren("\\HASCHILDREN");
 
 bool TreeItemMailbox::hasNoChildMaliboxesAlreadyKnown()
 {
-    if (m_metadata.flags.contains(flagNoInferiors) ||
-        (m_metadata.flags.contains(flagHasNoChildren) &&
-         ! m_metadata.flags.contains(flagHasChildren)))
-        return true;
-    else
-        return false;
+    return (m_metadata.flags.contains(flagNoInferiors)   ||
+           (m_metadata.flags.contains(flagHasNoChildren) &&
+           !m_metadata.flags.contains(flagHasChildren)));
 }
 
 bool TreeItemMailbox::hasChildMailboxes(Model *const model)

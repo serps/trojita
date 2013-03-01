@@ -45,10 +45,7 @@ bool MailAddress::fromPrettyString(MailAddress &into, const QString &address)
     if (!parseOneAddress(into, address, offset))
         return false;
 
-    if (offset < address.size())
-        return false;
-
-    return true;
+    return (offset >= address.size());
 }
 
 /* A simple regexp to match an address typed into the input field. */
