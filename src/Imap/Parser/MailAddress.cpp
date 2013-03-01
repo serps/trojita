@@ -45,7 +45,7 @@ bool MailAddress::fromPrettyString(MailAddress &into, const QString &address)
     if (!parseOneAddress(into, address, offset))
         return false;
 
-    return (offset >= address.size());
+    return offset >= address.size();
 }
 
 /* A simple regexp to match an address typed into the input field. */
@@ -256,12 +256,11 @@ QString MailAddress::asPrettyString() const
 
 QTextStream &operator<<(QTextStream &stream, const MailAddress &address)
 {
-    stream << '"' << address.name << "\" <";
+    stream << '"' << address.name << "\" <" << address.mailbox;
     if (!address.host.isNull())
-        stream << address.mailbox << '@' << address.host;
-    else
-        stream << address.mailbox;
+        stream << '@' << address.host;
     stream << '>';
+
     return stream;
 }
 
