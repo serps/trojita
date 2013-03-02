@@ -45,10 +45,17 @@ QString TagWidget::tagName() const
 
 void TagWidget::commonInit()
 {
-    setStyleSheet("border: 1px solid rgb(50, 150, 0);"
-                  "border-radius: 4px;"
-                  "background-color: rgb(154, 204, 101);"
-                  "color: black;");
+    static const QString tagStyle = QString::fromUtf8( \
+        "border: 1px solid %1;" \
+        "border-radius: 4px;"   \
+        "background-color: %2;" \
+        "color: %3;").arg(
+                         palette().light().color().name(),
+                         palette().toolTipBase().color().name(),
+                         palette().toolTipText().color().name()
+                         );
+
+    setStyleSheet(tagStyle);
 }
 
 } // namespace Gui
