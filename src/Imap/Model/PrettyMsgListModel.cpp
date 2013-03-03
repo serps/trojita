@@ -109,7 +109,7 @@ QVariant PrettyMsgListModel::data(const QModelIndex &index, int role) const
     case Qt::TextAlignmentRole:
         switch (index.column()) {
         case MsgListModel::SIZE:
-            return Qt::AlignRight;
+            return QVariant(Qt::AlignRight | Qt::AlignVCenter);
         default:
             return QVariant();
         }
