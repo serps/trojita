@@ -45,30 +45,17 @@ namespace Mailbox
 
 QString PrettySize::prettySize(uint bytes, const ShowBytesSuffix compactUnitFormat)
 {
-    if (bytes == 0) {
-        return tr("0");
+    if (bytes == 0 || (bytes < 1024 && compactUnitFormat == COMPACT_FORM)) {
+        return QString::number(bytes);
     }
-    int order = std::log(static_cast<double>(bytes)) / std::log(1024.0);
-    double number = bytes / std::pow(1024.0, order);
 
-    QString suffix;
-    if (order <= 0) {
-        if (compactUnitFormat == COMPACT_FORM)
-            return QString::number(bytes);
-        else
-            return tr("%1 bytes").arg(QString::number(bytes));
-    } else if (order == 1) {
-        suffix = tr("kB");
-    } else if (order == 2) {
-        suffix = tr("MB");
-    } else if (order == 3) {
-        suffix = tr("GB");
-    } else {
-        // make sure not to show wrong size for those that have > 1024 TB e-mail messages
-        order = 4;
-        suffix = tr("TB"); // shame on you for such mails
-    }
-    return tr("%1 %2").arg(QString::number(number, 'f', number < 100 ? 1 : 0), suffix);
+    // JEDEC Units... kind of (KB -> kB)
+    static const QString units[5] = {"bytes", "kB", "MB", "GB", "TB"};
+
+    const int order = std::log(static_cast<float>(bytes)) / std::log(1024.0f);
+    const float number = bytes / std::pow(1024.0f, order);
+
+    return QString("%1 %2").arg(QString::number(number, 'f', number < 100 ? 1 : 0), units[order]);
 }
 
 QString persistentLogFileName()
@@ -92,11 +79,6 @@ QString systemPlatformVersion()
     QString os = QLatin1String(""
 #ifdef Q_OS_AIX
                                     "AIX"
-#endif
-#ifdef Q_OS_BSD4
-#ifndef Q_OS_MAC
-                                    "AnyBSD4.4"
-#endif
 #endif
 #ifdef Q_OS_BSDI
                                     "BSD/OS"
@@ -177,11 +159,6 @@ QString systemPlatformVersion()
                                     "WinCE"
 #endif
                                    );
-#ifdef Q_OS_UNIX
-    if (os.isEmpty()) {
-        os = "Unix";
-    }
-#endif
 
     QString ws = ""
 #ifdef Q_WS_X11
@@ -334,15 +311,39 @@ switch (QSysInfo:s60Version()) {
 #endif
         }
 #endif
+
+#ifdef Q_OS_UNIX
         if (platformVersion.isEmpty()) {
-            // try to call the lsb_release
+            // Try to call the lsb_release on linux/gnu, uname on other unices or unix-like
             QProcess *proc = new QProcess(0);
+#ifdef Q_OS_LINUX
+            // Many distros ignore LSB - So lets be safe and try grab what we can from uname.
             proc->start("lsb_release", QStringList() << QLatin1String("-s") << QLatin1String("-d"));
             proc->waitForFinished();
+
             platformVersion = QString::fromLocal8Bit(proc->readAll()).trimmed().replace(QLatin1String("\""), QString()).replace(QLatin1String(";"), QLatin1String(","));
+
+            // The lsb_release bin is likely missing.
+            if (platformVersion.isEmpty())
+#endif // Q_OS_LINUX
+            // This block is just here to be lazy with the previous if statement.
+            {
+                if (os.isEmpty()) {
+                    proc->start("uname", QStringList() << QLatin1String("-m") << QLatin1String("-r") << QLatin1String("-so"));
+                } else {
+                    // We dont need the OS name since we got that earlier - So just get the version and march.
+                    proc->start("uname", QStringList() << QLatin1String("-m") << QLatin1String("-r"));
+                }
+                proc->waitForFinished();
+
+                platformVersion = QString::fromLocal8Bit(proc->readAll()).trimmed();
+            }
+
             proc->deleteLater();
         }
+#endif // Q_OS_UNIX
     }
+
     return QString::fromUtf8("Qt/%1; %2; %3; %4").arg(qVersion(), ws, os, platformVersion);
 }
 
